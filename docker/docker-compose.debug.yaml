@@ -1,0 +1,3 @@
+services:
+  casa-roma:
+    command: debug

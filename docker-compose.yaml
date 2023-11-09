@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  casa-roma:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/casa-roma
+    working_dir: /casa-roma
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    entrypoint: yarn
+    env_file:
+      - .env
+    depends_on:
+      - casa-roma-db
+  casa-roma-db:
+    image: postgres:14.5
+    container_name: casa-roma-db
+    volumes:
+      - casa-roma-db:/var/lib/postgresql/data
+    ports:
+      - 4005:${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+volumes:
+  casa-roma-db:
+    external: true

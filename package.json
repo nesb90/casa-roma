@@ -1,0 +1,27 @@
+{
+  "name": "casa_roma",
+  "version": "1.0.0",
+  "description": "Stocktaking app",
+  "main": "app.js",
+  "author": "nesb",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/autoload": "^5.8.0",
+    "fastify": "^4.24.3",
+    "fastify-jwt": "^4.2.0",
+    "fastify-plugin": "^4.5.1",
+    "knex": "^3.0.1",
+    "lodash": "^4.17.21",
+    "nodemon": "^3.0.1",
+    "pg": "^8.11.3"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "debug": "nodemon --inspect app.js",
+    "test": "test",
+    "init:db": "node 'src/db/scripts/create-schema-db.js'",
+    "db:migrate": "npx knex migrate:latest",
+    "db:migrate:revert": "npx knex migrate:rollback"
+  }
+}
