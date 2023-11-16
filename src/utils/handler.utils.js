@@ -21,7 +21,7 @@ function remove (tableName, id) {
 function update (tableName, id, data = {}) {
   let sql = `UPDATE ${POSTGRES.SCHEMA}.${tableName} SET `;
   Object.keys(data).forEach((key) => {
-    sql += `${key}='${data[key]}',`;
+    sql += `${_.snakeCase(key)}='${data[key]}',`;
   });
   sql += `updated_at='${new Date().toISOString()}' where id='${id}'`;
 
@@ -48,7 +48,7 @@ function select (tableName, id, props = []) {
     query = query.replace('*', `${keys}`);
     return [`${query} where id=($1)`, [id]];
   } else {
-    return query;
+    return `${query} order by id ASC`;
   }
 };
 
