@@ -1,25 +1,26 @@
 'use strict'
 
 const { SERVER } = require('../config');
-const orderItemHandlers = require('./handlers/order-item.handler')
+const paymentHandlers = require('./handlers/payment.handler');
 
-module.exports = async function order(fastify) {
+module.exports = async function payment(fastify) {
   fastify.route({
     method: 'GET',
-    url: `${SERVER.API_ROUTE.V1}/order-item/:id`,
+    url: `${SERVER.API_ROUTE.V1}/payment/:id`,
     schema: {
-      summary: 'Single Order Item',
-      description: 'Get an order item by id.',
+      summary: 'Single payment',
+      description: 'Get a payment by id.',
       produces: ['application/json'],
       response: {
         200: {
           type: 'object',
-          required: ['id', 'orderId', 'itemId', 'quantity'],
+          required: ['id', 'orderId', 'amount', 'payConcept', 'createdAt'],
           properties: {
             id: { type: 'number' },
             orderId: { type: 'number' },
-            itemId: { type: 'number' },
-            quantity: { type: 'number' }
+            amount: { type: 'number' },
+            payConcept: { type: 'string' },
+            createdAt: { type: 'string' }
           }
         },
         400: { $ref: 'badRequestResponse#' },
@@ -28,61 +29,61 @@ module.exports = async function order(fastify) {
         500: { $ref: 'systemErrorResponse#' }
       }
     },
-    handler: orderItemHandlers.getOrderItem
+    handler: paymentHandlers.getPaymentById
   });
 
   fastify.route({
     method: 'GET',
-    url: `${SERVER.API_ROUTE.V1}/order-item/order/:orderId`,
+    url: `${SERVER.API_ROUTE.V1}/payment`,
     schema: {
-      summary: 'Get order items',
-      description: 'Get all order items.',
+      summary: 'Get payments',
+      description: 'Get all payments.',
       response: {
         200: {
           type: 'array',
           items: {
             type: 'object',
-            required: ['id', 'orderId', 'itemId', 'quantity'],
+            required: ['id', 'orderId', 'amount', 'payConcept', 'createdAt'],
             properties: {
               id: { type: 'number' },
               orderId: { type: 'number' },
-              itemId: { type: 'number' },
-              quantity: { type: 'number' }
+              amount: { type: 'number' },
+              payConcept: { type: 'string' },
+              createdAt: { type: 'string' }
             }
-          }
-        },
-        400: { $ref: 'badRequestResponse#' },
-        401: { $ref: 'unauthorizedResponse#' },
-        404: { $ref: 'notFoundResponse#' },
-        500: { $ref: 'systemErrorResponse#' }
+          },
+          400: { $ref: 'badRequestResponse#' },
+          401: { $ref: 'unauthorizedResponse#' },
+          404: { $ref: 'notFoundResponse#' },
+          500: { $ref: 'systemErrorResponse#' }
+        }
       }
     },
-    handler: orderItemHandlers.getAllOrderItems
+    handler: paymentHandlers.getPayments
   });
 
   fastify.route({
     method: 'POST',
-    url: `${SERVER.API_ROUTE.V1}/order-item`,
+    url: `${SERVER.API_ROUTE.V1}/payment`,
     schema: {
-      summary: 'Create order',
-      description: 'Create a new order.',
+      summary: 'Create payment',
+      description: 'Create a new payment.',
       consumes: ['application/json'],
       produces: ['application/json'],
       body: {
         type: 'object',
-        required: ['orderId', 'itemId', 'quantity'],
+        required: ['orderId', 'amount', 'payConcept'],
         properties: {
           orderId: { type: 'number' },
-          itemId: { type: 'number' },
-          quantity: { type: 'number' }
+          amount: { type: 'number' },
+          payConcept: { type: 'string' }
         }
       },
       response: {
         200: {
           type: 'object',
-          required: ['id', 'message'],
+          required: ['message'],
           properties: {
-            id: { type: 'number' },
             message: { type: 'string' }
           }
         },
@@ -92,23 +93,20 @@ module.exports = async function order(fastify) {
         500: { $ref: 'systemErrorResponse#' }
       }
     },
-    handler: orderItemHandlers.createOrderItem
+    handler: paymentHandlers.createPayment
   });
 
   fastify.route({
     method: 'PUT',
-    url: `${SERVER.API_ROUTE.V1}/order-item/:id`,
+    url: `${SERVER.API_ROUTE.V1}/payment/:id`,
     schema: {
-      summary: 'Update order item',
-      description: 'Update order item properties.',
-      consumes: ['application/json'],
-      produces: ['application/json'],
+      summary: 'Update payment',
+      description: 'Update payment properties.',
       body: {
         type: 'object',
         properties: {
-          orderId: { type: 'number' },
-          itemId: { type: 'number' },
-          quantity: { type: 'number' }
+          amount: { type: 'number' },
+          payConcept: { type: 'string' }
         }
       },
       response: {
@@ -125,15 +123,15 @@ module.exports = async function order(fastify) {
         500: { $ref: 'systemErrorResponse#' }
       }
     },
-    handler: orderItemHandlers.updateOrderItem
+    handler: paymentHandlers.updatePayment
   });
 
   fastify.route({
     method: 'DELETE',
-    url: `${SERVER.API_ROUTE.V1}/order-item/:id`,
+    url: `${SERVER.API_ROUTE.V1}/payment/:id`,
     schema: {
-      summary: 'Delete order item',
-      description: 'Delete order item by Id.',
+      summary: 'Delete payments',
+      description: 'Delete payment by Id.',
       produces: ['application/json'],
       response: {
         200: {
@@ -141,7 +139,7 @@ module.exports = async function order(fastify) {
           required: ['message'],
           type: 'object',
           properties: {
-            message:  { type: 'string' }
+            message: { type: 'string' }
           }
         },
         400: { $ref: 'badRequestResponse#' },
@@ -150,6 +148,6 @@ module.exports = async function order(fastify) {
         500: { $ref: 'systemErrorResponse#' }
       }
     },
-    handler: orderItemHandlers.deleteOrderItemById
+    handler: paymentHandlers.deletePaymentById
   });
 };

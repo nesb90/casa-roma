@@ -20,4 +20,3 @@ exports.down = async function (knex) {
     table.dropUnique('item_id');
   });
 };
-

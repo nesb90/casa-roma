@@ -21,7 +21,9 @@ function remove (tableName, id) {
 function update (tableName, id, data = {}) {
   let sql = `UPDATE ${POSTGRES.SCHEMA}.${tableName} SET `;
   Object.keys(data).forEach((key) => {
-    sql += `${key}='${data[key]}',`;
+    if (data[key]) {
+      sql += `${_.snakeCase(key)}='${data[key]}',`;
+    };
   });
   sql += `updated_at='${new Date().toISOString()}' where id='${id}'`;
 
@@ -37,7 +39,8 @@ function update (tableName, id, data = {}) {
  * @returns Array || String
  */
 function select (tableName, id, props = []) {
-  let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`
+  let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`;
+
   if (id && props.length === 0) {
     return [`${query} where id=($1)`, [id]];
   } else if (id && props.length > 0) {
@@ -48,7 +51,7 @@ function select (tableName, id, props = []) {
     query = query.replace('*', `${keys}`);
     return [`${query} where id=($1)`, [id]];
   } else {
-    return query;
+    return `${query} order by id ASC`;
   }
 };
 
@@ -64,9 +67,11 @@ function insert (tableName, data) {
   const holders = [];
 
   Object.entries(data).forEach(([key, val], index) => {
-    keys.push(_.snakeCase(key));
-    values.push(val);
-    holders.push(`$${index + 1}`);
+    if (val) {
+      keys.push(_.snakeCase(key));
+      values.push(val);
+      holders.push(`$${index + 1}`);
+    }
   });
 
   return [`insert into ${POSTGRES.SCHEMA}.${tableName} (${keys}) values (${holders})`, values];
@@ -87,9 +92,14 @@ function parseData (data = {}) {
   return parsedObject;
 };
 
+function formatToISODate (date) {
+  return date ? new Date(date).toISOString() : new Date().toISOString();
+}
+
 module.exports = {
   parseData,
   parseDataArray,
+  formatToISODate,
   queryBuilder: {
     insert,
     select,

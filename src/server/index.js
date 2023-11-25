@@ -13,6 +13,8 @@ function launchServer (fastify, host, port) {
 }
 
 ;(async () => {
+  fastify.register(require('@fastify/cors'), {});
+
   fastify.register(autoload, {
     dir: path.join(__dirname, '../plugins')
   });
