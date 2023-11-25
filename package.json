@@ -19,7 +19,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "debug": "nodemon --inspect app.js",
+    "debug": "nodemon --inspect-brk=0.0.0.0:9229 app.js",
     "test": "test",
     "init:db": "node 'src/db/scripts/create-schema-db.js'",
     "db:migrate": "npx knex migrate:latest",
