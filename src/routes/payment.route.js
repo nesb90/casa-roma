@@ -63,6 +63,36 @@ module.exports = async function payment(fastify) {
   });
 
   fastify.route({
+    method: 'GET',
+    url: `${SERVER.API_ROUTE.V1}/order-payment/:orderId`,
+    schema: {
+      summary: 'Get order payments',
+      description: 'Get all payments for an order.',
+      response: {
+        200: {
+          type: 'array',
+          items: {
+            type: 'object',
+            required: ['id', 'orderId', 'amount', 'payConcept', 'createdAt'],
+            properties: {
+              id: { type: 'number' },
+              orderId: { type: 'number' },
+              amount: { type: 'number' },
+              payConcept: { type: 'string' },
+              createdAt: { type: 'string' }
+            }
+          },
+          400: { $ref: 'badRequestResponse#' },
+          401: { $ref: 'unauthorizedResponse#' },
+          404: { $ref: 'notFoundResponse#' },
+          500: { $ref: 'systemErrorResponse#' }
+        }
+      }
+    },
+    handler: paymentHandlers.getPaymentsByOrderId
+  });
+
+  fastify.route({
     method: 'POST',
     url: `${SERVER.API_ROUTE.V1}/payment`,
     schema: {

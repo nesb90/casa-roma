@@ -24,6 +24,22 @@ async function getPaymentById (request, reply) {
     .send(parseData(order));
 };
 
+async function getPaymentsByOrderId (request, reply) {
+  const { orderId } = request.params
+  this.log.info(`Getting payment ${orderId}`);
+  const [query, values] = queryBuilder.select(TABLES.payments, orderId);
+  const payments = await this.dbService.doQuery(query.replace('id=', 'order_id='), values);
+
+  if (!payments) {
+    reply.code(404).header('Content-Type', 'application/json').send({ message: 'Order not found' });
+  }
+
+  reply
+    .code(200)
+    .header('Content-Type', 'application/json')
+    .send(parseDataArray(payments));
+};
+
 async function getPayments (request, reply) {
   this.log.info('Getting payment all payments');
 
@@ -76,5 +92,6 @@ module.exports = {
   getPayments,
   createPayment,
   updatePayment,
-  deletePaymentById
+  deletePaymentById,
+  getPaymentsByOrderId
 };
