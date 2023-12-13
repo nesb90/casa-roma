@@ -38,7 +38,24 @@ function update (tableName, id, data = {}) {
  * @param {Array} props Array with specific column names to select
  * @returns Array || String
  */
-function select (tableName, id, props = [], filters = {}) {
+function select (tableName, id, props = []) {
+  let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`;
+
+  if (props.length > 0) {
+    const keys = props.map((prop) => {
+      return _.snakeCase(prop);
+    });
+    query = query.replace('*', `${keys.join(',')}`);
+  };
+
+  if (id) {
+    return [`${query} where id=($1)`, [id]];
+  } else {
+    return `${query} order by id ASC`;
+  };
+};
+
+function selectOrders (tableName, id, props = [], filters = {}) {
   let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`;
 
   if (props.length > 0) {
@@ -127,6 +144,7 @@ module.exports = {
   queryBuilder: {
     insert,
     select,
+    selectOrders,
     update,
     remove
   }

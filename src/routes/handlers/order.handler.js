@@ -38,7 +38,7 @@ async function getAllOrders (request, reply) {
   this.log.info('Get all Orders');
 
 
-  const result = await this.dbService.doQuery(queryBuilder.select(TABLES.orders, undefined, undefined, filters));
+  const result = await this.dbService.doQuery(queryBuilder.selectOrders(TABLES.orders, undefined, undefined, filters));
 
   const orders = await Promise.all(result.map(async (order) => {
     order.items = await getOrderItemsByOrderId(order.id,  this.dbService);
