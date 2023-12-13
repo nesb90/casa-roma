@@ -50,6 +50,15 @@ module.exports = async function order(fastify) {
     schema: {
       summary: 'Get orders',
       description: 'Get all orders.',
+      querystring: {
+        type: 'object',
+        properties: {
+          startDate: { type: 'string', default: '' },
+          startDate: { type: 'string', default: '' },
+          cancelled: { type: 'boolean', default: false },
+          completed: { type: 'boolean', default: false }
+        }
+      },
       response: {
         200: {
           type: 'array',
