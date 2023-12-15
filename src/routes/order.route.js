@@ -72,6 +72,7 @@ module.exports = async function order(fastify) {
               eventDate: { type: 'string' },
               returnedAt: { type: 'string' },
               isCancelled: { type: 'boolean' },
+              createdAt: { type: 'string' },
               items: {
                 type: 'array',
                 items: {
