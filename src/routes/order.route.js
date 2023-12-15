@@ -14,14 +14,25 @@ module.exports = async function order(fastify) {
       response: {
         200: {
           type: 'object',
-          required: ['id', 'customerName', 'address', 'eventDate', 'returnedAt', 'isCancelled'],
+          required: ['id', 'customerName', 'address', 'eventDate', 'returnedAt', 'isCancelled', 'items'],
           properties: {
             id: { type: 'number' },
             customerName: { type: 'string' },
             address: { type: 'string' },
             eventDate: { type: 'string' },
             returnedAt: { type: 'string' },
-            isCancelled: { type: 'boolean' }
+            isCancelled: { type: 'boolean' },
+            items: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['itemId', 'quantity'],
+                properties: {
+                  itemId: { type: 'number' },
+                  quantity: { type: 'number' }
+                }
+              }
+            }
           }
         },
         400: { $ref: 'badRequestResponse#' },
@@ -39,6 +50,15 @@ module.exports = async function order(fastify) {
     schema: {
       summary: 'Get orders',
       description: 'Get all orders.',
+      querystring: {
+        type: 'object',
+        properties: {
+          startDate: { type: 'string', default: '' },
+          startDate: { type: 'string', default: '' },
+          cancelled: { type: 'boolean', default: false },
+          completed: { type: 'boolean', default: false }
+        }
+      },
       response: {
         200: {
           type: 'array',
@@ -51,7 +71,20 @@ module.exports = async function order(fastify) {
               address: { type: 'string' },
               eventDate: { type: 'string' },
               returnedAt: { type: 'string' },
-              isCancelled: { type: 'boolean' }
+              isCancelled: { type: 'boolean' },
+              createdAt: { type: 'string' },
+              items: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  required: [ 'id', 'itemId', 'quantity'],
+                  properties: {
+                    id: { type: 'number' },
+                    itemId: { type: 'number' },
+                    quantity: { type: 'number' }
+                  }
+                }
+              }
             }
           }
         },

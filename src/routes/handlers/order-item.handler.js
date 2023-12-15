@@ -37,12 +37,13 @@ async function getAllOrderItems(request, reply) {
 async function createOrderItem(request, reply) {
   const data = request.body
 
-  await this.dbService.doQuery(...queryBuilder.insert(TABLES.orderItems, data));
+  const [query, values] = queryBuilder.insert(TABLES.orderItems, data)
+  const [orderItem] = await this.dbService.doQuery(query.concat(' RETURNING id'), values);
 
   reply
     .code(200)
     .header('Content-Type', 'application/json')
-    .send({ message: 'Order item Created' });
+    .send({ id: orderItem.id, message: 'Order item Created' });
 };
 
 async function updateOrderItem(request, reply) {

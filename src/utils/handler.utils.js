@@ -21,7 +21,9 @@ function remove (tableName, id) {
 function update (tableName, id, data = {}) {
   let sql = `UPDATE ${POSTGRES.SCHEMA}.${tableName} SET `;
   Object.keys(data).forEach((key) => {
-    sql += `${key}='${data[key]}',`;
+    if (data[key]) {
+      sql += `${_.snakeCase(key)}='${data[key]}',`;
+    };
   });
   sql += `updated_at='${new Date().toISOString()}' where id='${id}'`;
 
@@ -37,19 +39,61 @@ function update (tableName, id, data = {}) {
  * @returns Array || String
  */
 function select (tableName, id, props = []) {
-  let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`
-  if (id && props.length === 0) {
-    return [`${query} where id=($1)`, [id]];
-  } else if (id && props.length > 0) {
-    const keys = props.map((prop) => {
-      _.snakeCase(prop);
-    });
+  let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`;
 
-    query = query.replace('*', `${keys}`);
+  if (props.length > 0) {
+    const keys = props.map((prop) => {
+      return _.snakeCase(prop);
+    });
+    query = query.replace('*', `${keys.join(',')}`);
+  };
+
+  if (id) {
     return [`${query} where id=($1)`, [id]];
   } else {
-    return query;
-  }
+    return `${query} order by id ASC`;
+  };
+};
+
+function selectOrders (tableName, id, props = [], filters = {}) {
+  let query =  `select * from ${POSTGRES.SCHEMA}.${tableName}`;
+
+  if (props.length > 0) {
+    const keys = props.map((prop) => {
+      return _.snakeCase(prop);
+    });
+    query = query.replace('*', `${keys.join(',')}`);
+  };
+
+  if (!_.isEmpty(filters)) {
+    if (filters.startDate && filters.endDate) {
+      query = query.concat(` where created_at BETWEEN '${filters.startDate}' and '${filters.endDate}'`);
+    };
+
+    if (filters.cancelled) {
+      if (query.includes('where')) {
+        query = query.concat(` and is_cancelled = ${filters.cancelled}`);
+      } else {
+        query = query.concat(` where is_cancelled = ${filters.cancelled}`);
+      };
+    }
+
+    if (filters.completed) {
+      if (filters.cancelled) {
+        query = query.concat(' or returned_at notnull');
+      } else if (!filters.cancelled && query.includes('where')) {
+        query = query.concat(' and returned_at notnull');
+      } else {
+        query = query.concat(' where returned_at notnull');
+      }
+    };
+  };
+
+  if (id) {
+    return [`${query} where id=($1)`, [id]];
+  } else {
+    return `${query} order by id ASC`;
+  };
 };
 
 /**
@@ -64,9 +108,11 @@ function insert (tableName, data) {
   const holders = [];
 
   Object.entries(data).forEach(([key, val], index) => {
-    keys.push(_.snakeCase(key));
-    values.push(val);
-    holders.push(`$${index + 1}`);
+    if (val) {
+      keys.push(_.snakeCase(key));
+      values.push(val);
+      holders.push(`$${index + 1}`);
+    }
   });
 
   return [`insert into ${POSTGRES.SCHEMA}.${tableName} (${keys}) values (${holders})`, values];
@@ -87,12 +133,18 @@ function parseData (data = {}) {
   return parsedObject;
 };
 
+function formatToISODate (date) {
+  return date ? new Date(date).toISOString() : new Date().toISOString();
+}
+
 module.exports = {
   parseData,
   parseDataArray,
+  formatToISODate,
   queryBuilder: {
     insert,
     select,
+    selectOrders,
     update,
     remove
   }

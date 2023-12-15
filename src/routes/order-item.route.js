@@ -80,8 +80,9 @@ module.exports = async function order(fastify) {
       response: {
         200: {
           type: 'object',
-          required: ['message'],
+          required: ['id', 'message'],
           properties: {
+            id: { type: 'number' },
             message: { type: 'string' }
           }
         },
