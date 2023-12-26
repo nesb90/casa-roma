@@ -3,7 +3,6 @@ setup:
 	cp -n .env.example .env
 
 install:
-	rm -rf node_modules
 	docker-compose -f docker-compose.yaml -f docker/docker-compose.install.yaml up casa-roma
 
 init-db:
