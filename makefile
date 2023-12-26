@@ -2,6 +2,10 @@ setup:
 	docker volume create --name=casa-roma-db
 	cp -n .env.example .env
 
+install:
+	rm -rf node_modules
+	docker-compose -f docker-compose.yaml -f docker/docker-compose.install.yaml up casa-roma
+
 init-db:
 	docker-compose run --rm casa-roma run init:db
 

@@ -28,12 +28,12 @@ async function getStockById (request, reply) {
 async function getStock (request, reply) {
   this.log.info('Get all stocks');
 
-  const result = await this.dbService.doQuery(queryBuilder.select(TABLES.stock))
+  const result = await this.stockService.getAllStocks();
 
   reply
     .code(200)
     .header('Content-Type', 'application/json')
-    .send(parseDataArray(result));
+    .send(result);
 };
 
 async function createStock (request, reply) {
