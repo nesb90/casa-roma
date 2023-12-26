@@ -43,13 +43,14 @@ module.exports = async function stock (fastify) {
           type: 'array',
           items: {
             type: 'object',
-            required: ['id', 'itemId', 'total', 'initialStock'],
+            required: ['id', 'itemId', 'total', 'initialStock', 'availableStock'],
             type: 'object',
             properties: {
               id: { type: 'number' },
               itemId: { type: 'number' },
               total: { type: 'number' },
-              initialStock: { type: 'number' }
+              initialStock: { type: 'number' },
+              availableStock: { type: 'number' }
             }
           }
         },
