@@ -53,10 +53,12 @@ module.exports = async function order(fastify) {
       querystring: {
         type: 'object',
         properties: {
-          startDate: { type: 'string', default: '' },
-          startDate: { type: 'string', default: '' },
+          paid: { type: 'boolean'},
+          inProgress: { type: 'boolean' },
           cancelled: { type: 'boolean', default: false },
-          completed: { type: 'boolean', default: false }
+          completed: { type: 'boolean', default: false },
+          limit: { type: 'number' },
+          offset: { type: 'number' }
         }
       },
       response: {
