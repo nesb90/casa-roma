@@ -47,7 +47,7 @@ class OrderService {
     if (id) {
       return [`${query} where id=($1)`, [id]];
     } else {
-      return `${query} order by id ASC`;
+      return `${query} order by created_at DESC`;
     };
   };
 
