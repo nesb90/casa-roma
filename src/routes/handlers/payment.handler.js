@@ -12,7 +12,7 @@ async function getPaymentById (request, reply) {
   const { id } = request.params
   this.log.info(`Getting payment ${id}`);
 
-  const [order] = await this.dbService.doQuery(...queryBuilder.select(TABLES.payments, id))
+  const [order] = await this.dbService.doQuery(...queryBuilder.select(TABLES.payments, id));
 
   if (!order) {
     reply.code(404).header('Content-Type', 'application/json').send({ message: 'Order not found' });
@@ -27,8 +27,8 @@ async function getPaymentById (request, reply) {
 async function getPaymentsByOrderId (request, reply) {
   const { orderId } = request.params
   this.log.info(`Getting payment ${orderId}`);
-  const [query, values] = queryBuilder.select(TABLES.payments, orderId);
-  const payments = await this.dbService.doQuery(query.replace('id=', 'order_id='), values);
+
+  const payments = await this.paymentService.getPaymentsByOrderId(orderId);
 
   if (!payments) {
     reply.code(404).header('Content-Type', 'application/json').send({ message: 'Order not found' });
@@ -37,7 +37,7 @@ async function getPaymentsByOrderId (request, reply) {
   reply
     .code(200)
     .header('Content-Type', 'application/json')
-    .send(parseDataArray(payments));
+    .send(payments);
 };
 
 async function getPayments (request, reply) {
