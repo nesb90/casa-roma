@@ -1,6 +1,7 @@
 'use strict'
 
 const { SERVER } = require('../config');
+const { ORDER_STATUSES } = require('../utils');
 const orderHandlers = require('./handlers/order.handler')
 
 module.exports = async function order(fastify) {
@@ -14,14 +15,15 @@ module.exports = async function order(fastify) {
       response: {
         200: {
           type: 'object',
-          required: ['id', 'customerName', 'address', 'eventDate', 'returnedAt', 'isCancelled', 'items'],
+          required: ['id', 'customerName', 'address', 'eventDate', 'returnedAt', 'status', 'items'],
           properties: {
             id: { type: 'number' },
             customerName: { type: 'string' },
             address: { type: 'string' },
             eventDate: { type: 'string' },
             returnedAt: { type: 'string' },
-            isCancelled: { type: 'boolean' },
+            escrow: { type: 'number' },
+            status: { enum: ORDER_STATUSES },
             items: {
               type: 'array',
               items: {
@@ -53,12 +55,9 @@ module.exports = async function order(fastify) {
       querystring: {
         type: 'object',
         properties: {
-          paid: { type: 'boolean'},
-          inProgress: { type: 'boolean' },
-          cancelled: { type: 'boolean', default: false },
-          completed: { type: 'boolean', default: false },
-          limit: { type: 'number' },
-          offset: { type: 'number' }
+          status: { type: 'string' },
+          limit: { type: 'number', default: 10 },
+          offset: { type: 'number', default: 0 }
         }
       },
       response: {
@@ -66,20 +65,21 @@ module.exports = async function order(fastify) {
           type: 'array',
           items: {
             type: 'object',
-            required: ['id', 'customerName', 'address', 'eventDate', 'returnedAt', 'isCancelled'],
+            required: ['id', 'customerName', 'address', 'eventDate', 'returnedAt', 'status'],
             properties: {
               id: { type: 'number' },
               customerName: { type: 'string' },
               address: { type: 'string' },
               eventDate: { type: 'string' },
               returnedAt: { type: 'string' },
-              isCancelled: { type: 'boolean' },
+              escrow: { type: 'number' },
+              status: { enum: ORDER_STATUSES },
               createdAt: { type: 'string' },
               items: {
                 type: 'array',
                 items: {
                   type: 'object',
-                  required: [ 'id', 'itemId', 'quantity'],
+                  required: ['id', 'itemId', 'quantity'],
                   properties: {
                     id: { type: 'number' },
                     itemId: { type: 'number' },
@@ -190,7 +190,7 @@ module.exports = async function order(fastify) {
           required: ['message'],
           type: 'object',
           properties: {
-            message:  { type: 'string' }
+            message: { type: 'string' }
           }
         },
         400: { $ref: 'badRequestResponse#' },
