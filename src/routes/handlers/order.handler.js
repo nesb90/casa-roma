@@ -6,14 +6,6 @@ const {
   TABLES
 } = require('../../utils');
 
-async function getOrderItemsByOrderId (orderId, dbService) {
-  const orderItems =  await dbService.doQuery(`select * from ${POSTGRES.SCHEMA}.${TABLES.orderItems} where order_id=${orderId}`);
-  if (Array.isArray(orderItems) && orderItems.length > 0) {
-    return parseDataArray(orderItems);
-  };
-  return []
-}
-
 async function getOrder (request, reply) {
   const { id } = request.params
   this.log.info(`Getting order ${id}`);
@@ -36,11 +28,9 @@ async function getAllOrders (request, reply) {
   const filters = request.query;
   this.log.info('Get all Orders');
 
-
-  const result = await this.orderService.getOrders(TABLES.orders, undefined, undefined, filters);
-
+  const result = await this.orderService.getOrders(filters.status);
   const orders = await Promise.all(result.map(async (order) => {
-    order.items = await getOrderItemsByOrderId(order.id,  this.dbService);
+    order.items = await this.orderService.getOrderItemsByOrderId(order.id);
     return order;
   }));
 

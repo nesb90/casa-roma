@@ -6,6 +6,14 @@ const TABLES = {
   payments: 'payments'
 };
 
+const ORDER_STATUSES = [
+  'RECEIVED',
+  'PROCESSING',
+  'CANCELLED',
+  'COMPLETED'
+];
+
 module.exports = {
-  TABLES
+  TABLES,
+  ORDER_STATUSES
 };
