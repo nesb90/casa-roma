@@ -22,18 +22,23 @@ class OrderService {
     return [];
   };
 
-  buildGetOrdersQuery(status) {
+  buildGetOrdersQuery(filters) {
+    const {
+      status,
+      limit,
+      offset
+    } = filters;
     let query = `select * from ${POSTGRES.SCHEMA}.${this.tableName}`;
 
     if (!_.isEmpty(status)) {
       query = query.concat(` where status = '${status}'`)
     };
 
-    return `${query} order by created_at DESC`;
+    return `${query} order by created_at DESC LIMIT ${limit} OFFSET ${offset}`;
   };
 
-  async getOrders(status = '') {
-    return await this.dbService.doQuery(this.buildGetOrdersQuery(status));
+  async getOrders(filters) {
+    return await this.dbService.doQuery(this.buildGetOrdersQuery(filters));
   };
 };
 

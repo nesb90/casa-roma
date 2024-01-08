@@ -28,7 +28,7 @@ async function getAllOrders (request, reply) {
   const filters = request.query;
   this.log.info('Get all Orders');
 
-  const result = await this.orderService.getOrders(filters.status);
+  const result = await this.orderService.getOrders(filters);
   const orders = await Promise.all(result.map(async (order) => {
     order.items = await this.orderService.getOrderItemsByOrderId(order.id);
     return order;
