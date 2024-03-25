@@ -2,8 +2,10 @@ const _ = require('lodash');
 
 const { isRequired,
   TABLES,
-  parseDataArray
- } = require("../utils");
+  parseDataArray,
+  queryBuilder,
+  parseData
+} = require("../utils");
 const { POSTGRES } = require('../config');
 
 class OrderService {
@@ -22,7 +24,7 @@ class OrderService {
     return [];
   };
 
-  buildGetOrdersQuery(filters) {
+  buildGetOrdersQuery (filters) {
     const {
       status,
       limit,
@@ -37,8 +39,14 @@ class OrderService {
     return `${query} order by created_at DESC LIMIT ${limit} OFFSET ${offset}`;
   };
 
-  async getOrders(filters) {
+  async getOrders (filters) {
     return await this.dbService.doQuery(this.buildGetOrdersQuery(filters));
+  };
+
+  async getOrderStatus (orderId) {
+    const [query, params] = queryBuilder.select(TABLES.orders, orderId, ['status']);
+    const [result] = await this.dbService.doQuery(query, params);
+    return parseData(result);
   };
 };
 

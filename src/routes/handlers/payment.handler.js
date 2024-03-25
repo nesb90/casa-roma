@@ -2,7 +2,8 @@ const {
   parseDataArray,
   parseData,
   queryBuilder,
-  TABLES
+  TABLES,
+  ORDER_STATUSES
 } = require('../../utils');
 /**
  * Note: fastify object is bound to `this`
@@ -54,6 +55,17 @@ async function getPayments (request, reply) {
 async function createPayment (request, reply) {
   const data =  request.body
   this.log.info('Creating new payment', data);
+
+  const hasPayments = await this.paymentService.hasPayments(data.orderId);
+
+  if(!hasPayments) {
+    console.log('Initial payment');
+    const orderData = {
+      status: ORDER_STATUSES[1]
+    };
+
+    await this.dbService.doQuery(queryBuilder.update(TABLES.orders, data.orderId, orderData));
+  };
 
   await this.dbService.doQuery(...queryBuilder.insert(TABLES.payments, data));
 
