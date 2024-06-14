@@ -3,7 +3,8 @@ const {
   parseDataArray,
   parseData,
   queryBuilder,
-  TABLES
+  TABLES,
+  ORDER_STATUSES
 } = require('../../utils');
 
 async function getOrder (request, reply) {
@@ -41,7 +42,7 @@ async function getAllOrders (request, reply) {
 };
 
 async function createOrder (request, reply) {
-  const { items, ...data} = request.body
+  const { items, ...data} = request.body;
 
   const [sql, values] = queryBuilder.insert(TABLES.orders, data)
   const result = await this.dbService.doQuery(sql.concat(' RETURNING id'), values);
@@ -63,6 +64,9 @@ async function updateOrder (request, reply) {
   const data =  request.body
   const id = request.params.id
 
+  if (data.returnedAt) {
+    data.status = ORDER_STATUSES[3];
+  };
   await this.dbService.doQuery(queryBuilder.update(TABLES.orders, id, data));
 
   reply

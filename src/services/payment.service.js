@@ -6,6 +6,7 @@ const {
   queryBuilder
 } = require("../utils");
 const { getOrderTotalQuery } = require('../db/db.queries');
+const { POSTGRES } = require("../config");
 
 class PaymentService {
   constructor({
@@ -42,6 +43,13 @@ class PaymentService {
 
     return this.buildPayment(payments, orderTotal);
   };
+
+  async hasPayments (orderId) {
+    const query = `select count(*) as total from ${POSTGRES.SCHEMA}.${TABLES.payments} where order_id = ${orderId}`;
+    let [result] = await this.dbService.doQuery(query);
+    return result.total > 0;
+  };
+
 };
 
 module.exports = PaymentService;

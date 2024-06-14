@@ -109,10 +109,11 @@ module.exports = async function order(fastify) {
       produces: ['application/json'],
       body: {
         type: 'object',
-        required: ['customerName', 'address', 'eventDate'],
+        required: ['customerName', 'address', 'eventDate', 'status'],
         properties: {
           customerName: { type: 'string' },
           address: { type: 'string' },
+          status: { type: 'string' },
           eventDate: { type: 'string' },
           items: {
             type: 'array',
