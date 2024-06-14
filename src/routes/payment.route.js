@@ -70,16 +70,24 @@ module.exports = async function payment(fastify) {
       description: 'Get all payments for an order.',
       response: {
         200: {
-          type: 'array',
-          items: {
-            type: 'object',
-            required: ['id', 'orderId', 'amount', 'payConcept', 'createdAt'],
-            properties: {
-              id: { type: 'number' },
-              orderId: { type: 'number' },
-              amount: { type: 'number' },
-              payConcept: { type: 'string' },
-              createdAt: { type: 'string' }
+          type: 'object',
+          required: ['orderTotal', 'currentBalance', 'payments'],
+          properties: {
+            currentBalance: { type: 'number' },
+            orderTotal: { type: 'number' },
+            payments: {
+              type: 'array',
+              items: {
+                type: 'object',
+                required: ['id', 'orderId', 'amount', 'payConcept', 'createdAt'],
+                properties: {
+                  id: { type: 'number' },
+                  orderId: { type: 'number' },
+                  amount: { type: 'number' },
+                  payConcept: { type: 'string' },
+                  createdAt: { type: 'string' }
+                }
+              }
             }
           },
           400: { $ref: 'badRequestResponse#' },

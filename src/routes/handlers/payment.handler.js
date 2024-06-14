@@ -2,7 +2,8 @@ const {
   parseDataArray,
   parseData,
   queryBuilder,
-  TABLES
+  TABLES,
+  ORDER_STATUSES
 } = require('../../utils');
 /**
  * Note: fastify object is bound to `this`
@@ -12,7 +13,7 @@ async function getPaymentById (request, reply) {
   const { id } = request.params
   this.log.info(`Getting payment ${id}`);
 
-  const [order] = await this.dbService.doQuery(...queryBuilder.select(TABLES.payments, id))
+  const [order] = await this.dbService.doQuery(...queryBuilder.select(TABLES.payments, id));
 
   if (!order) {
     reply.code(404).header('Content-Type', 'application/json').send({ message: 'Order not found' });
@@ -27,8 +28,8 @@ async function getPaymentById (request, reply) {
 async function getPaymentsByOrderId (request, reply) {
   const { orderId } = request.params
   this.log.info(`Getting payment ${orderId}`);
-  const [query, values] = queryBuilder.select(TABLES.payments, orderId);
-  const payments = await this.dbService.doQuery(query.replace('id=', 'order_id='), values);
+
+  const payments = await this.paymentService.getPaymentsByOrderId(orderId);
 
   if (!payments) {
     reply.code(404).header('Content-Type', 'application/json').send({ message: 'Order not found' });
@@ -37,7 +38,7 @@ async function getPaymentsByOrderId (request, reply) {
   reply
     .code(200)
     .header('Content-Type', 'application/json')
-    .send(parseDataArray(payments));
+    .send(payments);
 };
 
 async function getPayments (request, reply) {
@@ -54,6 +55,17 @@ async function getPayments (request, reply) {
 async function createPayment (request, reply) {
   const data =  request.body
   this.log.info('Creating new payment', data);
+
+  const hasPayments = await this.paymentService.hasPayments(data.orderId);
+
+  if(!hasPayments) {
+    console.log('Initial payment');
+    const orderData = {
+      status: ORDER_STATUSES[1]
+    };
+
+    await this.dbService.doQuery(queryBuilder.update(TABLES.orders, data.orderId, orderData));
+  };
 
   await this.dbService.doQuery(...queryBuilder.insert(TABLES.payments, data));
 

@@ -4,9 +4,9 @@ const { POSTGRES } = require('../config');
 const {
   isRequired,
   parseDataArray,
-  parseData,
   queryBuilder,
-  TABLES
+  TABLES,
+  ORDER_STATUSES
 } = require('../utils')
 
 class StockService {
@@ -27,7 +27,7 @@ class StockService {
       on
         oi.order_id = o.id
       where
-        o.is_cancelled = false and o.returned_at is null
+        o.status = '${ORDER_STATUSES[1]}'
       group by item_id
       order by item_id asc
     `;
