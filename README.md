@@ -1,5 +1,9 @@
 # Casa Roma
 ## Tableware rental service
+
+### Front end project
+- https://github.com/nesb90/casa-roma-ui
+
 ### Dependencies
 
 - yarn
